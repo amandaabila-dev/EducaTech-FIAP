@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: educatech
+      POSTGRES_PASSWORD: educatech
+      POSTGRES_DB: educatech
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgres://educatech:educatech@db:5432/educatech
+    depends_on:
+      - db
+
+  test:
+    image: node:20-slim
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: sh -c "npm ci && npm test"
+    environment:
+      DATABASE_URL: postgres://educatech:educatech@db:5432/educatech
+    depends_on:
+      - db
+    profiles:
+      - test
+
+volumes:
+  postgres_data:

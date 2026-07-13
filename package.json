@@ -1,0 +1,28 @@
+{
+  "name": "educatech-fiap",
+  "version": "1.0.0",
+  "description": "EducaTech FIAP - API REST de blogging educacional (Fase 2)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "jest --coverage --runInBand",
+    "test:unit": "jest tests/unit --coverage --runInBand",
+    "test:integration": "jest tests/integration --runInBand",
+    "test:watch": "jest --watch --runInBand",
+    "test:docker": "docker compose --profile test run --rm test",
+    "docker:up": "docker compose up --build -d",
+    "docker:down": "docker compose down"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "pg": "^8.13.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  }
+}
