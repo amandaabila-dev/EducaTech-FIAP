@@ -20,44 +20,7 @@ API REST de blogging educacional — refatoração do back-end da **Fase 1 (OutS
 
 Arquitetura **MVC**: `routes` → `controllers` → `services` → `repositories` → PostgreSQL.
 
-```
-src/
-├── config/constants.js      # Telas e labels da Fase 1
-├── controllers/             # REST + UI Flows
-├── services/PostService.js
-├── repositories/postRepository.js
-├── routes/                  # /posts e /Home, /Admin…
-├── database/init.sql        # Schema + seed (fonte única)
-├── utils/postMapper.js      # Fase 1 ↔ Fase 2
-├── app.js
-└── server.js
-```
-
 Não versionados: `node_modules/`, `coverage/`, `.env`, `local/`.
-
----
-
-## Configuração e execução
-
-```powershell
-copy .env.example .env
-npm run docker:up          # recomendado
-```
-
-| Serviço | Porta |
-|---------|-------|
-| API | http://localhost:3000 |
-| Swagger | http://localhost:3000/api-docs |
-| PostgreSQL | 5432 (interno) |
-
-Sem Docker:
-
-```powershell
-npm install && npm start     # produção
-npm run dev                  # reload automático
-```
-
-Recriar banco: `docker compose down -v && docker compose up --build`
 
 ---
 
@@ -73,8 +36,6 @@ Recriar banco: `docker compose down -v && docker compose up --build`
 | POST | `/posts` | Cria |
 | PUT | `/posts/:id` | Atualiza (parcial) |
 | DELETE | `/posts/:id` | Remove (204) |
-
-Body aceita Fase 1 (`Titulo`, `Conteudo`) ou Fase 2 (`title`, `content`).
 
 ### UI Flows — formato OutSystems
 
@@ -108,8 +69,6 @@ Content-Type: application/json
 GET http://localhost:3000/Admin
 ```
 
-Mais exemplos no Swagger UI.
-
 ---
 
 ## Testes
@@ -124,22 +83,5 @@ Integração usa PostgreSQL real (`tests/integration/`). Unitários em `tests/un
 CI (`.github/workflows/ci.yml`): testes + build Docker na branch `main`.
 
 ---
-
-## Problemas comuns
-
-| Problema | Solução |
-|----------|---------|
-| `npm` não encontrado | `npm run docker:up` / `npm run test:docker` |
-| Porta 5432 no navegador | Use porta **3000** (API) |
-| Docker falha no Windows | `docker compose down && docker compose up --build` |
-| Dados/schema antigos | `docker compose down -v && docker compose up --build` |
-
----
-
-## Equipe
-
-| Nome | RM |
-|------|----|
-| Amanda Abila Melo | 373430 |
 
 Projeto acadêmico — FIAP Pós Tech (Full Stack Development).
