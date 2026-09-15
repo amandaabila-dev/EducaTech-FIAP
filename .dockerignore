@@ -1,0 +1,7 @@
+node_modules
+coverage
+frontend
+local
+.git
+.github
+*.md
