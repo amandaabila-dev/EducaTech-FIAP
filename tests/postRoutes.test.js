@@ -6,17 +6,61 @@ const request = require('supertest');
 const app = require('../src/app');
 const { initDatabase, query } = require('../src/connection');
 const { cleanupTestPosts, buildRestPost } = require('./integrationDb');
+const { loginAsTeacher } = require('./authHelper');
 
 describe('Posts REST - Integration Tests', () => {
   let createdPostId;
+  let auth;
 
   beforeAll(async () => {
     await initDatabase();
     await cleanupTestPosts(query);
+    auth = await loginAsTeacher(app);
   });
 
   afterAll(async () => {
     await cleanupTestPosts(query);
+  });
+
+  it('POST /login autentica o professor', async () => {
+    const response = await request(app).post('/login').send({
+      email: 'professor@educatech.com',
+      senha: 'educatech123',
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.token).toBeDefined();
+    expect(response.body.user).toMatchObject({
+      email: 'professor@educatech.com',
+      role: 'professor',
+    });
+  });
+
+  it('POST /login rejeita senha inválida', async () => {
+    const response = await request(app).post('/login').send({
+      email: 'professor@educatech.com',
+      senha: 'senha-errada',
+    });
+
+    expect(response.status).toBe(401);
+    expect(response.body.error).toBe('E-mail ou senha inválidos.');
+  });
+
+  it('POST /posts sem token retorna 401', async () => {
+    const response = await request(app).post('/posts').send(buildRestPost());
+
+    expect(response.status).toBe(401);
+    expect(response.body.error).toBe('Token de autenticação ausente.');
+  });
+
+  it('PUT /posts/:id com token inválido retorna 401', async () => {
+    const response = await request(app)
+      .put('/posts/1')
+      .set({ Authorization: 'Bearer token-invalido' })
+      .send({ title: 'x' });
+
+    expect(response.status).toBe(401);
+    expect(response.body.error).toBe('Token inválido ou expirado.');
   });
 
   it('GET /posts retorna lista sem posts de teste inicialmente', async () => {
@@ -32,7 +76,7 @@ describe('Posts REST - Integration Tests', () => {
   it('POST /posts cria um post', async () => {
     const payload = buildRestPost({ title: `${buildRestPost().title} principal` });
 
-    const response = await request(app).post('/posts').send(payload);
+    const response = await request(app).post('/posts').set(auth).send(payload);
 
     expect(response.status).toBe(201);
     expect(response.body.id).toBeDefined();
@@ -56,6 +100,7 @@ describe('Posts REST - Integration Tests', () => {
   it('PUT /posts/:id atualiza o post', async () => {
     const response = await request(app)
       .put(`/posts/${createdPostId}`)
+      .set(auth)
       .send({
         title: `${buildRestPost().title} atualizado`,
         content: 'Conteúdo atualizado',
@@ -70,6 +115,7 @@ describe('Posts REST - Integration Tests', () => {
   it('PUT /posts/:id aceita atualização parcial', async () => {
     const response = await request(app)
       .put(`/posts/${createdPostId}`)
+      .set(auth)
       .send({ title: `${buildRestPost().title} parcial` });
 
     expect(response.status).toBe(200);
@@ -95,7 +141,7 @@ describe('Posts REST - Integration Tests', () => {
   });
 
   it('GET /posts?page=1&limit=1 retorna resultado paginado', async () => {
-    await request(app).post('/posts').send(
+    await request(app).post('/posts').set(auth).send(
       buildRestPost({ title: `${buildRestPost().title} segundo` })
     );
 
@@ -109,7 +155,7 @@ describe('Posts REST - Integration Tests', () => {
   });
 
   it('DELETE /posts/:id exclui o post', async () => {
-    const response = await request(app).delete(`/posts/${createdPostId}`);
+    const response = await request(app).delete(`/posts/${createdPostId}`).set(auth);
 
     expect(response.status).toBe(204);
     expect(response.body).toEqual({});
@@ -130,7 +176,7 @@ describe('Posts REST - Integration Tests', () => {
   });
 
   it('POST /posts retorna 400 quando dados são inválidos', async () => {
-    const response = await request(app).post('/posts').send({});
+    const response = await request(app).post('/posts').set(auth).send({});
 
     expect(response.status).toBe(400);
     expect(response.body.error).toContain('Titulo é obrigatório');
@@ -144,7 +190,7 @@ describe('Posts REST - Integration Tests', () => {
   });
 
   it('POST /posts retorna 400 quando título excede limite', async () => {
-    const response = await request(app).post('/posts').send(
+    const response = await request(app).post('/posts').set(auth).send(
       buildRestPost({ title: 'a'.repeat(256) })
     );
 

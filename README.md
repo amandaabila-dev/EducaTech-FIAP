@@ -36,8 +36,8 @@ Interface gráfica em **React** para a plataforma de blogging educacional EducaT
         ├── App.jsx           # Mapa de rotas e layout
         ├── pages/            # HomePage, PostPage, LoginPage, AdminPage, Create/EditPostPage, NotFoundPage
         ├── components/       # Header, Footer, PostCard, SearchBar, PostForm, ProtectedRoute…
-        ├── contexts/         # AuthContext (login do professor)
-        ├── services/api.js   # Chamadas REST
+        ├── contexts/         # AuthContext (sessão JWT do professor)
+        ├── services/api.js   # Chamadas REST (Bearer nas rotas de escrita)
         ├── styles/           # theme.js, GlobalStyle.js, ui.js (componentes reutilizáveis)
         └── utils/format.js   # Datas e resumos de texto
 ```
@@ -88,17 +88,24 @@ npm run dev
 
 O front-end fica em http://localhost:5173 e o Vite faz proxy de `/api` para a API na porta 3000.
 
+### Variáveis de ambiente da API (`.env`)
+
+| Variável | Padrão | Função |
+|----------|--------|--------|
+| `JWT_SECRET` | `educatech-dev-jwt-secret` | Segredo para assinar o JWT (só no servidor) |
+| `JWT_EXPIRES_IN` | `8h` | Validade do token |
+| `AUTH_EMAIL` | `professor@educatech.com` | E-mail do professor |
+| `AUTH_PASSWORD` | `educatech123` | Senha do professor (nunca use `VITE_`) |
+| `AUTH_NAME` | `Prof. Amanda Abila Melo` | Nome exibido após o login |
+
 ### Variáveis de ambiente do front-end (`frontend/.env`)
 
 | Variável | Padrão | Função |
 |----------|--------|--------|
 | `VITE_API_URL` | `/api` | URL base da API usada pelo `services/api.js` |
 | `BACKEND_URL` | `http://localhost:3000` | Destino do proxy do Vite em desenvolvimento |
-| `VITE_AUTH_EMAIL` | `professor@educatech.com` | E-mail aceito no login |
-| `VITE_AUTH_PASSWORD` | `educatech123` | Senha aceita no login |
-| `VITE_AUTH_NAME` | `Prof. Amanda Abila Melo` | Nome exibido no cabeçalho |
 
-Sem arquivo `.env` a aplicação usa esses padrões e funciona normalmente.
+Sem arquivo `.env` a aplicação usa esses padrões e funciona normalmente. A senha **não** entra no bundle do React.
 
 ---
 
@@ -108,8 +115,8 @@ Detalhes de **personas**, **user flows** (Mermaid) e **style guide** (cores, tip
 
 ```
 Navegador → React Router → Páginas → services/api.js → API Express → PostgreSQL
-                              ↓
-                        AuthContext (localStorage)
+                              ↓                         ↑
+                        AuthContext (JWT)         POST /login + requireAuth
 ```
 
 | Camada | Onde fica | Responsabilidade |
@@ -129,7 +136,7 @@ Todas as telas usam **componentes funcionais e hooks** (`useState`, `useEffect`,
 |-------------------|--------|------------------|
 | `/` | Público | `GET /posts`, `GET /posts/search?q=` |
 | `/posts/:id` | Público | `GET /posts/:id` |
-| `/login` | Público | — (validação local) |
+| `/login` | Público | `POST /login` |
 | `/admin` | Professor | `GET /posts`, `DELETE /posts/:id` |
 | `/admin/posts/novo` | Professor | `POST /posts` |
 | `/admin/posts/:id/editar` | Professor | `GET /posts/:id`, `PUT /posts/:id` |
@@ -138,13 +145,13 @@ Formato dos posts na API: `id`, `title`, `content`, `author`, `subject`, `create
 
 ### Autenticação e autorização
 
-O back-end da Fase 2 não possui login (a rota `/Login` responde 503). A autenticação foi implementada **no front-end**:
+O login é validado **no servidor** com JWT:
 
-- `AuthContext` valida e-mail e senha contra as variáveis `VITE_AUTH_*` e grava a sessão em `localStorage`.
-- `ProtectedRoute` redireciona quem não está autenticado para `/login`, guardando a rota de origem para voltar depois do login.
+- `POST /login` compara e-mail e senha com `AUTH_*` (variáveis só da API), devolve `{ token, user }` e o `AuthContext` grava a sessão em `localStorage`.
+- `GET /posts`, `GET /posts/search` e `GET /posts/:id` continuam públicos.
+- `POST /posts`, `PUT /posts/:id` e `DELETE /posts/:id` (e os equivalentes da Fase 1) exigem `Authorization: Bearer <token>`. Sem token a API responde **401**.
+- `ProtectedRoute` ainda redireciona quem não está autenticado para `/login`, guardando a rota de origem.
 - O cabeçalho alterna entre "Entrar" e o bloco "Área do Professor / Nova Postagem / Sair".
-
-> Por ser validação apenas no cliente, o objetivo é controlar a navegação, não proteger a API. Uma autenticação real (JWT no back-end) fica como evolução natural do projeto.
 
 ### Estilização e responsividade
 
@@ -193,6 +200,7 @@ O workflow `.github/workflows/ci.yml` roda três jobs na branch `main`: testes d
 | `Não foi possível conectar à API` | Suba o back-end (`npm start`) ou use `docker compose up` |
 | Porta 8080 ocupada | Altere o mapeamento do serviço `web` no `docker-compose.yml` |
 | Alterações no `.env` do front-end não aplicaram | Reinicie o `npm run dev` (o Vite lê as variáveis na inicialização) |
+| Criar/editar/excluir retorna 401 | Faça login de novo; o JWT pode ter expirado |
 | Dados/schema antigos no banco | `docker compose down -v && docker compose up --build` |
 
 ---

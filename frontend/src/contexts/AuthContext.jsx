@@ -1,19 +1,14 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
-const STORAGE_KEY = 'educatech.sessao';
-
-const CREDENTIALS = {
-  email: import.meta.env.VITE_AUTH_EMAIL || 'professor@educatech.com',
-  password: import.meta.env.VITE_AUTH_PASSWORD || 'educatech123',
-  name: import.meta.env.VITE_AUTH_NAME || 'Prof. Amanda Abila Melo',
-};
+import { clearSession, login as loginRequest, SESSION_STORAGE_KEY } from '../services/api';
 
 const AuthContext = createContext(null);
 
 function readStoredUser() {
   try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : null;
+    const stored = window.localStorage.getItem(SESSION_STORAGE_KEY);
+    const parsed = stored ? JSON.parse(stored) : null;
+    return parsed?.token ? parsed : null;
   } catch {
     return null;
   }
@@ -22,30 +17,30 @@ function readStoredUser() {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(readStoredUser);
 
-  function login(email, password) {
-    const emailInformado = String(email || '').trim().toLowerCase();
-    const senhaInformada = String(password || '');
-
-    if (
-      emailInformado !== CREDENTIALS.email.toLowerCase() ||
-      senhaInformada !== CREDENTIALS.password
-    ) {
-      throw new Error('E-mail ou senha inválidos.');
+  useEffect(() => {
+    function onUnauthorized() {
+      setUser(null);
     }
 
-    const logged = { email: CREDENTIALS.email, name: CREDENTIALS.name, role: 'professor' };
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(logged));
+    window.addEventListener('educatech:unauthorized', onUnauthorized);
+    return () => window.removeEventListener('educatech:unauthorized', onUnauthorized);
+  }, []);
+
+  async function login(email, password) {
+    const { token, user: loggedUser } = await loginRequest(email, password);
+    const logged = { ...loggedUser, token };
+    window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(logged));
     setUser(logged);
     return logged;
   }
 
   function logout() {
-    window.localStorage.removeItem(STORAGE_KEY);
+    clearSession();
     setUser(null);
   }
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: Boolean(user), login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: Boolean(user?.token), login, logout }}>
       {children}
     </AuthContext.Provider>
   );

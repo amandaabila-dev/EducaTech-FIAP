@@ -29,19 +29,24 @@ function LoginPage() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   if (isAuthenticated) {
     return <Navigate to={destino} replace />;
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+    setError('');
+    setSubmitting(true);
 
     try {
-      login(email, senha);
+      await login(email, senha);
       navigate(destino, { replace: true });
     } catch (err) {
       setError(err.message);
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -79,7 +84,9 @@ function LoginPage() {
           />
         </Field>
 
-        <Button type="submit">Entrar</Button>
+        <Button type="submit" disabled={submitting}>
+          {submitting ? 'Entrando...' : 'Entrar'}
+        </Button>
       </form>
 
       <Hint>

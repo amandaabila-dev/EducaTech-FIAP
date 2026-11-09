@@ -24,8 +24,8 @@ const APP = {
     login: 'Login',
   },
   login: {
-    active: false,
-    message: 'Login inativo na Fase 1. Acesso direto à Área do Professor (Admin).',
+    active: true,
+    message: 'Informe e-mail e senha. Autentique-se em POST /login para receber um JWT.',
     labels: {
       novaPostagem: 'Nova Postagem',
       salvar: 'Salvar',

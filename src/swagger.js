@@ -4,22 +4,51 @@ const swaggerSpec = {
   openapi: '3.0.0',
   info: {
     title: 'EducaTech FIAP API',
-    version: '3.0.0',
-    description: 'API REST e UI Flows do EducaTech FIAP — consumida pelo front-end React da Fase 3',
+    version: '3.1.0',
+    description:
+      'API REST do EducaTech FIAP. Leitura é pública; criação, edição e exclusão exigem JWT obtido em POST /login.',
   },
   servers: [{ url: 'http://localhost:3000' }],
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+    },
+  },
   paths: {
+    '/login': {
+      post: {
+        summary: 'Autentica o professor e devolve um JWT',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  email: { type: 'string' },
+                  senha: { type: 'string' },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     '/posts': {
-      get: { summary: 'Lista postagens' },
-      post: { summary: 'Cria postagem' },
+      get: { summary: 'Lista postagens (público)' },
+      post: { summary: 'Cria postagem', security: [{ bearerAuth: [] }] },
     },
     '/posts/{id}': {
-      get: { summary: 'Busca postagem por ID' },
-      put: { summary: 'Atualiza postagem' },
-      delete: { summary: 'Remove postagem' },
+      get: { summary: 'Busca postagem por ID (público)' },
+      put: { summary: 'Atualiza postagem', security: [{ bearerAuth: [] }] },
+      delete: { summary: 'Remove postagem', security: [{ bearerAuth: [] }] },
     },
     '/posts/search': {
-      get: { summary: 'Busca postagens por termo' },
+      get: { summary: 'Busca postagens por termo (público)' },
     },
     '/Home': { get: { summary: 'Tela Home (Fase 1)' } },
     '/Admin': { get: { summary: 'Área do Professor (Fase 1)' } },

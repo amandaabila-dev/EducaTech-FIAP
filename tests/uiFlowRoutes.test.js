@@ -6,13 +6,16 @@ const request = require('supertest');
 const app = require('../src/app');
 const { initDatabase, query } = require('../src/connection');
 const { cleanupTestPosts, buildUiFlowPost } = require('./integrationDb');
+const { loginAsTeacher } = require('./authHelper');
 
 describe('UI Flows - Integration Tests', () => {
   let createdPostId;
+  let auth;
 
   beforeAll(async () => {
     await initDatabase();
     await cleanupTestPosts(query);
+    auth = await loginAsTeacher(app);
   });
 
   afterAll(async () => {
@@ -36,7 +39,7 @@ describe('UI Flows - Integration Tests', () => {
   it('POST /NewPost cria postagem no formato Fase 1', async () => {
     const payload = buildUiFlowPost();
 
-    const response = await request(app).post('/NewPost').send(payload);
+    const response = await request(app).post('/NewPost').set(auth).send(payload);
 
     expect(response.status).toBe(201);
     expect(response.body).toMatchObject({
@@ -85,6 +88,7 @@ describe('UI Flows - Integration Tests', () => {
   it('PUT /PostEdition/:id atualiza postagem', async () => {
     const response = await request(app)
       .put(`/PostEdition/${createdPostId}`)
+      .set(auth)
       .send({ Titulo: `${buildUiFlowPost().Titulo} editada` });
 
     expect(response.status).toBe(200);
@@ -102,20 +106,27 @@ describe('UI Flows - Integration Tests', () => {
     expect(response.body.Posts.length).toBeGreaterThan(0);
   });
 
-  it('GET /Login retorna tela inativa no formato Fase 1', async () => {
+  it('GET /Login retorna tela ativa no formato Fase 1', async () => {
     const response = await request(app).get('/Login');
 
-    expect(response.status).toBe(503);
+    expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
       Application: 'EducaTechFIAP',
       Screen: 'Login',
-      Active: false,
+      Active: true,
+      Endpoint: '/login',
     });
     expect(response.body.Labels).toHaveProperty('areaDoProfessor');
   });
 
+  it('POST /NewPost sem token retorna 401', async () => {
+    const response = await request(app).post('/NewPost').send(buildUiFlowPost());
+
+    expect(response.status).toBe(401);
+  });
+
   it('DELETE /PostDeletion/:id exclui postagem', async () => {
-    const response = await request(app).delete(`/PostDeletion/${createdPostId}`);
+    const response = await request(app).delete(`/PostDeletion/${createdPostId}`).set(auth);
 
     expect(response.status).toBe(200);
     expect(response.body.Screen).toBe('PostDeletion');
