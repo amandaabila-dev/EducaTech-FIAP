@@ -30,8 +30,8 @@ describe('requireAuth', () => {
 
   it('aceita JWT válido e preenche req.user', () => {
     const token = signToken({
-      email: 'professor@educatech.com',
-      name: 'Prof. Amanda Abila Melo',
+      email: process.env.AUTH_EMAIL,
+      name: process.env.AUTH_NAME,
       role: 'professor',
     });
     const req = { headers: { authorization: `Bearer ${token}` } };
@@ -40,7 +40,7 @@ describe('requireAuth', () => {
     requireAuth(req, mockRes(), next);
 
     expect(next).toHaveBeenCalled();
-    expect(req.user.email).toBe('professor@educatech.com');
+    expect(req.user.email).toBe(process.env.AUTH_EMAIL);
     expect(req.user.role).toBe('professor');
     expect(jwt.decode(token).role).toBe('professor');
   });

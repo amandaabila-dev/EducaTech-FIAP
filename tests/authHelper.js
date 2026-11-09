@@ -2,8 +2,8 @@ const request = require('supertest');
 
 async function loginAsTeacher(app) {
   const response = await request(app).post('/login').send({
-    email: process.env.AUTH_EMAIL || 'professor@educatech.com',
-    senha: process.env.AUTH_PASSWORD || 'educatech123',
+    email: process.env.AUTH_EMAIL,
+    senha: process.env.AUTH_PASSWORD,
   });
 
   if (response.status !== 200 || !response.body.token) {

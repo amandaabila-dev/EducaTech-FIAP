@@ -24,21 +24,21 @@ describe('Posts REST - Integration Tests', () => {
 
   it('POST /login autentica o professor', async () => {
     const response = await request(app).post('/login').send({
-      email: 'professor@educatech.com',
-      senha: 'educatech123',
+      email: process.env.AUTH_EMAIL,
+      senha: process.env.AUTH_PASSWORD,
     });
 
     expect(response.status).toBe(200);
     expect(response.body.token).toBeDefined();
     expect(response.body.user).toMatchObject({
-      email: 'professor@educatech.com',
+      email: process.env.AUTH_EMAIL.toLowerCase(),
       role: 'professor',
     });
   });
 
   it('POST /login rejeita senha inválida', async () => {
     const response = await request(app).post('/login').send({
-      email: 'professor@educatech.com',
+      email: process.env.AUTH_EMAIL,
       senha: 'senha-errada',
     });
 

@@ -18,11 +18,11 @@ services:
     environment:
       PORT: 3000
       DATABASE_URL: postgres://educatech:educatech@db:5432/educatech
-      JWT_SECRET: ${JWT_SECRET:-educatech-dev-jwt-secret}
-      JWT_EXPIRES_IN: 8h
-      AUTH_EMAIL: ${AUTH_EMAIL:-professor@educatech.com}
-      AUTH_PASSWORD: ${AUTH_PASSWORD:-educatech123}
-      AUTH_NAME: ${AUTH_NAME:-Prof. Amanda Abila Melo}
+      JWT_SECRET: ${JWT_SECRET:?Defina JWT_SECRET no arquivo .env}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-8h}
+      AUTH_EMAIL: ${AUTH_EMAIL:?Defina AUTH_EMAIL no arquivo .env}
+      AUTH_PASSWORD: ${AUTH_PASSWORD:?Defina AUTH_PASSWORD no arquivo .env}
+      AUTH_NAME: ${AUTH_NAME:-Professor}
     depends_on:
       - db
 
@@ -41,9 +41,6 @@ services:
     command: sh -c "npm ci && npm test"
     environment:
       DATABASE_URL: postgres://educatech:educatech@db:5432/educatech
-      JWT_SECRET: educatech-dev-jwt-secret
-      AUTH_EMAIL: professor@educatech.com
-      AUTH_PASSWORD: educatech123
     depends_on:
       - db
     profiles:

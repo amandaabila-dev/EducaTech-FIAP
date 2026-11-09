@@ -5,25 +5,50 @@ const SALT_ROUNDS = 10;
 
 let cachedPasswordHash;
 
+function requiredEnv(name) {
+  const value = String(process.env[name] || '').trim();
+
+  if (!value) {
+    const error = new Error(`Variável de ambiente ${name} não configurada.`);
+    error.statusCode = 500;
+    throw error;
+  }
+
+  return value;
+}
+
+function assertAuthConfig() {
+  requiredEnv('JWT_SECRET');
+  requiredEnv('AUTH_EMAIL');
+
+  if (!String(process.env.AUTH_PASSWORD_HASH || '').trim() && !String(process.env.AUTH_PASSWORD || '').trim()) {
+    const error = new Error('Configure AUTH_PASSWORD ou AUTH_PASSWORD_HASH.');
+    error.statusCode = 500;
+    throw error;
+  }
+}
+
 function getJwtSecret() {
-  return process.env.JWT_SECRET || 'educatech-dev-jwt-secret';
+  return requiredEnv('JWT_SECRET');
 }
 
 function getTeacher() {
   return {
-    email: String(process.env.AUTH_EMAIL || 'professor@educatech.com').trim().toLowerCase(),
-    name: process.env.AUTH_NAME || 'Prof. Amanda Abila Melo',
+    email: requiredEnv('AUTH_EMAIL').toLowerCase(),
+    name: String(process.env.AUTH_NAME || 'Professor').trim(),
     role: 'professor',
   };
 }
 
 function getPasswordHash() {
-  if (process.env.AUTH_PASSWORD_HASH) {
-    return process.env.AUTH_PASSWORD_HASH;
+  const hashConfigurado = String(process.env.AUTH_PASSWORD_HASH || '').trim();
+
+  if (hashConfigurado) {
+    return hashConfigurado;
   }
 
   if (!cachedPasswordHash) {
-    cachedPasswordHash = bcrypt.hashSync(process.env.AUTH_PASSWORD || 'educatech123', SALT_ROUNDS);
+    cachedPasswordHash = bcrypt.hashSync(requiredEnv('AUTH_PASSWORD'), SALT_ROUNDS);
   }
 
   return cachedPasswordHash;
@@ -42,6 +67,8 @@ function verifyToken(token) {
 }
 
 async function authenticate(email, password) {
+  assertAuthConfig();
+
   const teacher = getTeacher();
   const emailInformado = String(email || '').trim().toLowerCase();
   const senhaInformada = String(password || '');
@@ -57,6 +84,7 @@ async function authenticate(email, password) {
 }
 
 module.exports = {
+  assertAuthConfig,
   authenticate,
   getTeacher,
   signToken,

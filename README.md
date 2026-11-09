@@ -90,13 +90,13 @@ O front-end fica em http://localhost:5173 e o Vite faz proxy de `/api` para a AP
 
 ### Variáveis de ambiente da API (`.env`)
 
-| Variável | Padrão | Função |
-|----------|--------|--------|
-| `JWT_SECRET` | `educatech-dev-jwt-secret` | Segredo para assinar o JWT (só no servidor) |
-| `JWT_EXPIRES_IN` | `8h` | Validade do token |
-| `AUTH_EMAIL` | `professor@educatech.com` | E-mail do professor |
-| `AUTH_PASSWORD` | `educatech123` | Senha do professor (nunca use `VITE_`) |
-| `AUTH_NAME` | `Prof. Amanda Abila Melo` | Nome exibido após o login |
+| Variável | Obrigatória | Função |
+|----------|-------------|--------|
+| `JWT_SECRET` | Sim | Segredo para assinar o JWT (só no servidor) |
+| `JWT_EXPIRES_IN` | Não (`8h`) | Validade do token |
+| `AUTH_EMAIL` | Sim | E-mail do professor |
+| `AUTH_PASSWORD` | Sim | Senha do professor. Fica só no `.env`, nunca no código nem em variável `VITE_` |
+| `AUTH_NAME` | Não | Nome exibido após o login |
 
 ### Variáveis de ambiente do front-end (`frontend/.env`)
 
@@ -105,7 +105,7 @@ O front-end fica em http://localhost:5173 e o Vite faz proxy de `/api` para a AP
 | `VITE_API_URL` | `/api` | URL base da API usada pelo `services/api.js` |
 | `BACKEND_URL` | `http://localhost:3000` | Destino do proxy do Vite em desenvolvimento |
 
-Sem arquivo `.env` a aplicação usa esses padrões e funciona normalmente. A senha **não** entra no bundle do React.
+A API não sobe sem `JWT_SECRET`, `AUTH_EMAIL` e `AUTH_PASSWORD` no `.env`. Esses valores não têm padrão no código. O front-end não recebe a senha.
 
 ---
 
@@ -170,9 +170,7 @@ Styled Components com `ThemeProvider` (tokens em `styles/theme.js`) e `createGlo
 
 **Professor**
 
-1. Clique em "Entrar" e informe as credenciais de demonstração:
-   - E-mail: `professor@educatech.com`
-   - Senha: `educatech123`
+1. Clique em "Entrar" e informe o e-mail e a senha definidos em `AUTH_EMAIL` e `AUTH_PASSWORD`.
 2. Em "Área do Professor" você vê todas as postagens em tabela, com ações de editar e excluir (a exclusão pede confirmação).
 3. "Nova Postagem" abre o formulário com título, autor, matéria (opcional) e conteúdo.
 4. "Editar" carrega os dados atuais do post para alteração.

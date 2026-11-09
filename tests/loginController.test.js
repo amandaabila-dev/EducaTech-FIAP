@@ -16,7 +16,7 @@ describe('loginController', () => {
     const next = jest.fn();
 
     await loginController.login(
-      { body: { email: 'professor@educatech.com', senha: 'educatech123' } },
+      { body: { email: process.env.AUTH_EMAIL, senha: process.env.AUTH_PASSWORD } },
       { json },
       next
     );
@@ -26,7 +26,7 @@ describe('loginController', () => {
       expect.objectContaining({
         token: expect.any(String),
         user: expect.objectContaining({
-          email: 'professor@educatech.com',
+          email: process.env.AUTH_EMAIL.toLowerCase(),
           role: 'professor',
         }),
       })
@@ -38,7 +38,7 @@ describe('loginController', () => {
     const next = jest.fn();
 
     await loginController.login(
-      { body: { email: 'professor@educatech.com', senha: 'errada' } },
+      { body: { email: process.env.AUTH_EMAIL, senha: 'errada' } },
       { json },
       next
     );

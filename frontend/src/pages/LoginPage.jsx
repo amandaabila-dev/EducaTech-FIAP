@@ -11,15 +11,6 @@ const Wrapper = styled(Card)`
   margin: 0 auto;
 `;
 
-const Hint = styled.p`
-  margin-top: ${({ theme }) => theme.spacing.lg};
-  padding: ${({ theme }) => theme.spacing.md};
-  border-radius: ${({ theme }) => theme.radii.sm};
-  background-color: ${({ theme }) => theme.colors.primaryLight};
-  color: ${({ theme }) => theme.colors.primaryDark};
-  font-size: 0.9rem;
-`;
-
 function LoginPage() {
   const { isAuthenticated, login } = useAuth();
   const navigate = useNavigate();
@@ -88,10 +79,6 @@ function LoginPage() {
           {submitting ? 'Entrando...' : 'Entrar'}
         </Button>
       </form>
-
-      <Hint>
-        Credenciais de demonstração: <strong>professor@educatech.com</strong> / <strong>educatech123</strong>
-      </Hint>
     </Wrapper>
   );
 }

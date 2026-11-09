@@ -1,9 +1,17 @@
 require('dotenv').config();
 
 const app = require('./app');
+const { assertAuthConfig } = require('./auth');
 const { initDatabase, closePool } = require('./connection');
 
 const PORT = process.env.PORT || 3000;
+
+try {
+  assertAuthConfig();
+} catch (error) {
+  console.error(error.message);
+  process.exit(1);
+}
 
 initDatabase()
   .then(() => {

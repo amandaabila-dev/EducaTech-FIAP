@@ -7,6 +7,7 @@ module.exports = {
   coverageThreshold: {
     global: { statements: 30, branches: 30, functions: 30, lines: 30 },
   },
+  setupFiles: ['<rootDir>/tests/setupEnv.js'],
   moduleDirectories: ['node_modules', 'src'],
   globalTeardown: '<rootDir>/tests/teardown.js',
   forceExit: true,
