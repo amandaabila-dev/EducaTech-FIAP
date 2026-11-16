@@ -93,10 +93,17 @@ export const Tag = styled.span`
   display: inline-block;
   padding: 0.15rem 0.7rem;
   border-radius: ${({ theme }) => theme.radii.pill};
-  background-color: ${({ theme }) => theme.colors.primaryLight};
-  color: ${({ theme }) => theme.colors.primaryDark};
+  background-color: ${({ theme }) => theme.colors.secondaryLight};
+  color: ${({ theme }) => theme.colors.secondaryDark};
   font-size: 0.8rem;
   font-weight: 600;
+  text-decoration: none;
+  cursor: ${({ onClick, to }) => (onClick || to ? 'pointer' : 'default')};
+
+  &:hover {
+    text-decoration: none;
+    filter: brightness(0.96);
+  }
 `;
 
 export const Field = styled.div`
@@ -132,4 +139,23 @@ export const Actions = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const iconButtonBase = css`
+  ${buttonBase}
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 1rem;
+`;
+
+export const IconButton = styled.button`
+  ${iconButtonBase}
+  ${({ $variant = 'secondary' }) => variants[$variant]}
+`;
+
+export const IconLink = styled(Link)`
+  ${iconButtonBase}
+  ${({ $variant = 'secondary' }) => variants[$variant]}
 `;

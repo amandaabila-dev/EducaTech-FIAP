@@ -2,7 +2,7 @@
   "name": "educatech-frontend",
   "private": true,
   "version": "3.0.0",
-  "description": "EducaTech FIAP - Front-end React da Fase 3",
+  "description": "EducaTech FIAP — front-end React",
   "type": "module",
   "scripts": {
     "dev": "vite",

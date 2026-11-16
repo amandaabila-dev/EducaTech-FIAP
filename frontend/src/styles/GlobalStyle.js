@@ -23,7 +23,7 @@ const GlobalStyle = createGlobalStyle`
   h1, h2, h3, h4 {
     margin: 0 0 ${({ theme }) => theme.spacing.md};
     line-height: 1.25;
-    color: ${({ theme }) => theme.colors.primaryDark};
+    color: ${({ theme }) => theme.colors.ink};
   }
 
   p {
@@ -52,7 +52,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   :focus-visible {
-    outline: 3px solid ${({ theme }) => theme.colors.accent};
+    outline: 3px solid ${({ theme }) => theme.colors.primary};
     outline-offset: 2px;
   }
 
