@@ -4,9 +4,9 @@ const swaggerSpec = {
   openapi: '3.0.0',
   info: {
     title: 'EducaTech FIAP API',
-    version: '3.1.0',
+    version: '4.0.0',
     description:
-      'API REST do EducaTech FIAP. Leitura é pública; criação, edição e exclusão exigem JWT obtido em POST /login.',
+      'API REST do EducaTech FIAP. Leitura de posts é pública; login, CRUD de posts, professores e alunos exigem JWT de professor.',
   },
   servers: [{ url: 'http://localhost:3000' }],
   components: {
@@ -21,7 +21,7 @@ const swaggerSpec = {
   paths: {
     '/login': {
       post: {
-        summary: 'Autentica o professor e devolve um JWT',
+        summary: 'Autentica o professor (tabela teachers) e devolve um JWT',
         requestBody: {
           required: true,
           content: {
@@ -48,10 +48,30 @@ const swaggerSpec = {
       delete: { summary: 'Remove postagem', security: [{ bearerAuth: [] }] },
     },
     '/posts/search': {
-      get: { summary: 'Busca postagens por termo (público)' },
+      get: {
+        summary: 'Busca postagens por palavra-chave (q) e/ou matéria (subject)',
+      },
     },
-    '/Home': { get: { summary: 'Tela Home (Fase 1)' } },
-    '/Admin': { get: { summary: 'Área do Professor (Fase 1)' } },
+    '/teachers': {
+      get: { summary: 'Lista professores paginada (filtro opcional subject)', security: [{ bearerAuth: [] }] },
+      post: { summary: 'Cadastra professor', security: [{ bearerAuth: [] }] },
+    },
+    '/teachers/{id}': {
+      get: { summary: 'Busca professor por ID', security: [{ bearerAuth: [] }] },
+      put: { summary: 'Atualiza professor', security: [{ bearerAuth: [] }] },
+      delete: { summary: 'Remove professor', security: [{ bearerAuth: [] }] },
+    },
+    '/students': {
+      get: { summary: 'Lista alunos paginada (filtro opcional subject)', security: [{ bearerAuth: [] }] },
+      post: { summary: 'Cadastra aluno', security: [{ bearerAuth: [] }] },
+    },
+    '/students/{id}': {
+      get: { summary: 'Busca aluno por ID', security: [{ bearerAuth: [] }] },
+      put: { summary: 'Atualiza aluno', security: [{ bearerAuth: [] }] },
+      delete: { summary: 'Remove aluno', security: [{ bearerAuth: [] }] },
+    },
+    '/Home': { get: { summary: 'Lista da home (formato compatível OutSystems)' } },
+    '/Admin': { get: { summary: 'Área do professor (formato compatível OutSystems)' } },
     '/health': { get: { summary: 'Health check' } },
   },
 };

@@ -3,6 +3,11 @@ const mockQuery = jest.fn().mockResolvedValue({ rows: [] });
 const MockPool = jest.fn(() => ({ query: mockQuery, end: mockEnd }));
 
 jest.mock('pg', () => ({ Pool: MockPool }));
+jest.mock('../src/teacherRepository', () => ({
+  migrateInstitutionEmails: jest.fn().mockResolvedValue(undefined),
+  seedBootstrapTeacher: jest.fn().mockResolvedValue(undefined),
+  seedAuthorsAsTeachers: jest.fn().mockResolvedValue(undefined),
+}));
 
 describe('connection', () => {
   const originalDatabaseUrl = process.env.DATABASE_URL;
@@ -50,10 +55,12 @@ describe('connection', () => {
 
     await connection.initDatabase();
 
-    expect(mockQuery).toHaveBeenCalledTimes(1);
     expect(mockQuery.mock.calls[0][0]).toContain('CREATE TABLE IF NOT EXISTS posts');
+    expect(mockQuery.mock.calls[0][0]).toContain('CREATE TABLE IF NOT EXISTS teachers');
+    expect(mockQuery.mock.calls[0][0]).toContain('CREATE TABLE IF NOT EXISTS students');
     expect(mockQuery.mock.calls[0][0]).toContain('INSERT INTO posts');
     expect(mockQuery.mock.calls[0][0]).toContain('WHERE NOT EXISTS (SELECT 1 FROM posts LIMIT 1)');
+    expect(mockQuery).toHaveBeenCalledTimes(1);
   });
 
   it('fecha e libera o pool com closePool', async () => {

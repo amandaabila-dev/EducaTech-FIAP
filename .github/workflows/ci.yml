@@ -36,6 +36,10 @@ jobs:
       - run: npm test
         env:
           DATABASE_URL: postgres://educatech:educatech@localhost:5432/educatech
+          JWT_SECRET: ci-jwt-secret
+          AUTH_EMAIL: professor.teste@educatechfiap.com.br
+          AUTH_PASSWORD: ci-password
+          AUTH_NAME: Professor Teste
 
   frontend:
     name: Build do front-end

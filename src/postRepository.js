@@ -27,13 +27,27 @@ async function findById(id) {
   return result.rows[0] ? mapPostRow(result.rows[0]) : null;
 }
 
-async function search(term) {
-  const pattern = `%${term}%`;
+async function search({ term, subject } = {}) {
+  const filters = [];
+  const params = [];
+
+  if (term) {
+    params.push(`%${term}%`);
+    const index = params.length;
+    filters.push(
+      `(titulo ILIKE $${index} OR conteudo ILIKE $${index} OR materia ILIKE $${index} OR responsavel ILIKE $${index})`
+    );
+  }
+
+  if (subject) {
+    params.push(subject);
+    filters.push(`materia ILIKE $${params.length}`);
+  }
+
+  const where = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
   const result = await query(
-    `SELECT ${COLS} FROM posts
-     WHERE titulo ILIKE $1 OR conteudo ILIKE $1 OR materia ILIKE $1 OR responsavel ILIKE $1
-     ORDER BY data_criacao DESC`,
-    [pattern]
+    `SELECT ${COLS} FROM posts ${where} ORDER BY data_criacao DESC`,
+    params
   );
   return result.rows.map(mapPostRow);
 }

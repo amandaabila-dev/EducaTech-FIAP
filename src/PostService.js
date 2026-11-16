@@ -1,23 +1,10 @@
 const postRepository = require('./postRepository');
+const { erro, parseId, parsePagination } = require('./httpErrors');
 const {
   MAX_LENGTH,
   normalizePostInput,
   getProvidedPostFields,
 } = require('./postMapper');
-
-function erro(mensagem, statusCode) {
-  const error = new Error(mensagem);
-  error.statusCode = statusCode;
-  throw error;
-}
-
-function parsePostId(id) {
-  const parsedId = Number(id);
-  if (!Number.isInteger(parsedId) || parsedId <= 0) {
-    erro('ID inválido', 400);
-  }
-  return parsedId;
-}
 
 function validarCampos(dados, parcial = false) {
   const errors = [];
@@ -43,20 +30,6 @@ function validarCampos(dados, parcial = false) {
   return errors;
 }
 
-function parsePagination(query = {}) {
-  if (query.page == null && query.limit == null) return null;
-
-  const page = Number(query.page ?? 1);
-  const limit = Number(query.limit ?? 10);
-
-  if (!Number.isInteger(page) || page <= 0) erro('Parâmetro page inválido', 400);
-  if (!Number.isInteger(limit) || limit <= 0 || limit > 100) {
-    erro('Parâmetro limit inválido (máximo 100)', 400);
-  }
-
-  return { page, limit };
-}
-
 function prepararPost(dados) {
   const n = normalizePostInput(dados);
   return {
@@ -68,8 +41,7 @@ function prepararPost(dados) {
 }
 
 async function create(data) {
-  const normalizado = normalizePostInput(data);
-  const errors = validarCampos(normalizado);
+  const errors = validarCampos(normalizePostInput(data));
   if (errors.length) erro(errors.join(', '), 400);
   return postRepository.create(prepararPost(data));
 }
@@ -93,13 +65,13 @@ async function findAll(query = {}) {
 }
 
 async function findById(id) {
-  const post = await postRepository.findById(parsePostId(id));
+  const post = await postRepository.findById(parseId(id));
   if (!post) erro('Post não encontrado', 404);
   return post;
 }
 
 async function update(id, data) {
-  const postId = parsePostId(id);
+  const postId = parseId(id);
   const provided = getProvidedPostFields(data);
   if (!Object.keys(provided).length) erro('Nenhum campo para atualizar', 400);
 
@@ -128,21 +100,27 @@ async function update(id, data) {
 }
 
 async function deletePost(id) {
-  const deleted = await postRepository.remove(parsePostId(id));
+  const deleted = await postRepository.remove(parseId(id));
   if (!deleted) erro('Post não encontrado', 404);
 }
 
-async function search(term) {
-  if (!term || !String(term).trim()) {
-    erro('Parâmetro q é obrigatório para busca', 400);
+async function search(termOrQuery) {
+  const query =
+    termOrQuery && typeof termOrQuery === 'object' && !Array.isArray(termOrQuery)
+      ? termOrQuery
+      : { q: termOrQuery };
+
+  const term = String(query.q || query.term || '').trim();
+  const subject = String(query.subject || query.materia || '').trim();
+
+  if (!term && !subject) {
+    erro('Informe uma palavra-chave (q) ou uma matéria (subject)', 400);
   }
-  return postRepository.search(String(term).trim());
+
+  return postRepository.search({ term, subject });
 }
 
 module.exports = {
-  parsePostId,
-  parsePagination,
-  validarCampos,
   create,
   findAll,
   findById,

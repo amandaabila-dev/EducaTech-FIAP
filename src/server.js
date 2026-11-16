@@ -15,7 +15,7 @@ try {
 
 initDatabase()
   .then(() => {
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`EducaTech FIAP API rodando na porta ${PORT}`);
       console.log(`Swagger: http://localhost:${PORT}/api-docs`);
     });
