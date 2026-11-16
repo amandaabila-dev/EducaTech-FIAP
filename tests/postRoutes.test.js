@@ -140,6 +140,18 @@ describe('Posts REST - Integration Tests', () => {
     expect(response.body[0].author).toBe(buildRestPost().author);
   });
 
+  it('GET /posts/search filtra por matéria', async () => {
+    await request(app).post('/posts').set(auth).send(
+      buildRestPost({ title: `${buildRestPost().title} materia`, subject: 'Front-End' })
+    );
+
+    const response = await request(app).get('/posts/search').query({ subject: 'Front-End' });
+
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBeGreaterThan(0);
+    expect(response.body.every((post) => post.subject === 'Front-End')).toBe(true);
+  });
+
   it('GET /posts?page=1&limit=1 retorna resultado paginado', async () => {
     await request(app).post('/posts').set(auth).send(
       buildRestPost({ title: `${buildRestPost().title} segundo` })

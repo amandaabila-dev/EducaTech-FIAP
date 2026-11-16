@@ -1,6 +1,20 @@
+const bcrypt = require('bcryptjs');
+
+jest.mock('../src/teacherRepository');
+
+const teacherRepository = require('../src/teacherRepository');
 const loginController = require('../src/loginController');
 
 describe('loginController', () => {
+  beforeEach(() => {
+    teacherRepository.findByEmail.mockResolvedValue({
+      id: 1,
+      name: process.env.AUTH_NAME,
+      email: process.env.AUTH_EMAIL.toLowerCase(),
+      passwordHash: bcrypt.hashSync(process.env.AUTH_PASSWORD, 10),
+    });
+  });
+
   it('getLoginScreen retorna login ativo', () => {
     const json = jest.fn();
 
@@ -26,6 +40,7 @@ describe('loginController', () => {
       expect.objectContaining({
         token: expect.any(String),
         user: expect.objectContaining({
+          id: 1,
           email: process.env.AUTH_EMAIL.toLowerCase(),
           role: 'professor',
         }),

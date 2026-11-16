@@ -1,39 +1,37 @@
-# Dependências instaladas pelo npm (recriadas com npm install)
+# Dependências
 node_modules/
+mobile/node_modules/
 
-# Relatório de cobertura gerado pelo Jest (recriado com npm test)
-coverage/
-
-# Build do front-end gerado pelo Vite (recriado com npm run build)
-frontend/dist/
-
-# Arquivos locais do desenvolvedor (pasta local/)
-local/
-
-# Variáveis de ambiente com credenciais reais
+# Segredos e ambiente local
 .env
 .env.local
 .env.*.local
+mobile/.env
+frontend/.env
+
+# Builds e caches
+coverage/
+frontend/dist/
+mobile/.expo/
+mobile/dist/
+.nyc_output/
+*.tmp
+*.temp
 
 # Logs
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
-# Sistema operacional
+# Sistema e editores
 .DS_Store
 Thumbs.db
 desktop.ini
-
-# IDEs e editores
 .vscode/
 .idea/
 .cursor/
 *.swp
-*.swo
 
-# Cache e temporários
-.nyc_output/
-*.tmp
-*.temp
+# Pasta local de anotações e entregas compactadas (não versionar)
+local/
+*.zip
+Upload Fase 3/

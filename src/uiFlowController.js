@@ -88,7 +88,7 @@ async function postDeletion(req, res, next) {
 
 async function postSearch(req, res, next) {
   try {
-    const posts = await postService.search(req.query.q);
+    const posts = await postService.search(req.query);
     res.json(
       buildUiFlowResponse(APP.screens.postSearch, APP.profiles.aluno, APP.pageTitles.postSearch, {
         Query: req.query.q,

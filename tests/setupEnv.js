@@ -7,7 +7,7 @@ if (!process.env.JWT_SECRET) {
 }
 
 if (!process.env.AUTH_EMAIL) {
-  process.env.AUTH_EMAIL = 'professor.teste@educatech.local';
+  process.env.AUTH_EMAIL = 'professor.teste@educatechfiap.com.br';
 }
 
 if (!process.env.AUTH_PASSWORD && !process.env.AUTH_PASSWORD_HASH) {

@@ -49,7 +49,7 @@ async function deletePost(req, res, next) {
 
 async function searchPosts(req, res, next) {
   try {
-    res.json(mapPostsForRest(await postService.search(req.query.q)));
+    res.json(mapPostsForRest(await postService.search(req.query)));
   } catch (error) {
     next(error);
   }

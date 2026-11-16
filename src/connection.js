@@ -20,6 +20,10 @@ async function query(text, params) {
 async function initDatabase() {
   const initSql = fs.readFileSync(path.join(__dirname, 'init.sql'), 'utf8');
   await query(initSql);
+  const { migrateInstitutionEmails, seedBootstrapTeacher, seedAuthorsAsTeachers } = require('./teacherRepository');
+  await migrateInstitutionEmails();
+  await seedBootstrapTeacher();
+  await seedAuthorsAsTeachers();
 }
 
 async function closePool() {

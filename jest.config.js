@@ -2,7 +2,7 @@
 module.exports = {
   testEnvironment: 'node',
   testMatch: ['**/tests/**/*.test.js'],
-  testPathIgnorePatterns: ['/node_modules/', '/frontend/'],
+  testPathIgnorePatterns: ['/node_modules/', '/frontend/', '/mobile/'],
   collectCoverageFrom: ['src/**/*.js', '!src/server.js', '!src/swagger.js'],
   coverageThreshold: {
     global: { statements: 30, branches: 30, functions: 30, lines: 30 },

@@ -34,7 +34,6 @@ const APP = {
       areaDoProfessor: 'Área do Professor',
       email: 'E-mail:',
       senha: 'Senha:',
-      esqueciSenha: 'Esqueci a senha',
     },
   },
 };
