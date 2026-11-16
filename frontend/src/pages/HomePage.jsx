@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import EmptyState from '../components/EmptyState';
@@ -28,20 +29,32 @@ function normalizePosts(data) {
   return Array.isArray(data) ? data : data?.items ?? [];
 }
 
+function collectSubjects(items) {
+  return [...new Set(items.map((post) => post.subject).filter(Boolean))].sort();
+}
+
 function HomePage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [input, setInput] = useState('');
   const [query, setQuery] = useState('');
+  const [subject, setSubject] = useState(searchParams.get('subject') || '');
+  const [subjects, setSubjects] = useState([]);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  async function carregar(termo = '') {
+  async function carregar(termo = '', materia = '') {
     setLoading(true);
     setError('');
 
     try {
-      const data = termo ? await searchPosts(termo) : await listPosts();
-      setPosts(normalizePosts(data));
+      const data =
+        termo || materia
+          ? await searchPosts({ q: termo, subject: materia })
+          : await listPosts();
+      const items = normalizePosts(data);
+      setPosts(items);
+      if (!termo && !materia) setSubjects(collectSubjects(items));
     } catch (err) {
       setError(err.message);
       setPosts([]);
@@ -51,19 +64,28 @@ function HomePage() {
   }
 
   useEffect(() => {
-    carregar();
-  }, []);
+    const materia = searchParams.get('subject') || '';
+    setSubject(materia);
+    carregar(query, materia);
+  }, [searchParams]);
 
   function handleSearch(event) {
     event.preventDefault();
     const termo = input.trim();
     setQuery(termo);
-    carregar(termo);
+    carregar(termo, subject);
+  }
+
+  function handleSubjectChange(materia) {
+    if (materia) setSearchParams({ subject: materia });
+    else setSearchParams({});
   }
 
   function handleClear() {
     setInput('');
     setQuery('');
+    setSubject('');
+    setSearchParams({});
     carregar();
   }
 
@@ -72,18 +94,21 @@ function HomePage() {
       <PageHeader>
         <div>
           <h1>Postagens</h1>
-          <Subtitle>Conteúdos publicados pelos professores do EducaTech.</Subtitle>
+          <Subtitle>Filtre por palavra-chave e por matéria.</Subtitle>
         </div>
       </PageHeader>
 
       <SearchBar
         value={input}
         onChange={setInput}
+        subject={subject}
+        subjects={subjects}
+        onSubjectChange={handleSubjectChange}
         onSubmit={handleSearch}
         onClear={handleClear}
       />
 
-      <ErrorMessage message={error} onRetry={() => carregar(query)} />
+      <ErrorMessage message={error} onRetry={() => carregar(query, subject)} />
 
       {loading && <Loading label="Carregando postagens…" />}
 
@@ -91,8 +116,8 @@ function HomePage() {
         <EmptyState
           title="Nenhuma postagem encontrada"
           description={
-            query
-              ? `Não encontramos resultados para "${query}". Tente outras palavras-chave.`
+            query || subject
+              ? 'Não encontramos resultados para os filtros informados. Tente outras palavras-chave ou matérias.'
               : 'Ainda não há postagens publicadas.'
           }
         />

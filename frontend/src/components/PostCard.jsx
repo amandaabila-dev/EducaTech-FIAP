@@ -41,7 +41,11 @@ const Excerpt = styled.p`
 function PostCard({ post }) {
   return (
     <Card>
-      {post.subject && <Tag>{post.subject}</Tag>}
+      {post.subject && (
+        <Tag as={Link} to={`/?subject=${encodeURIComponent(post.subject)}`}>
+          {post.subject}
+        </Tag>
+      )}
 
       <h2>
         <Link to={`/posts/${post.id}`}>{post.title}</Link>

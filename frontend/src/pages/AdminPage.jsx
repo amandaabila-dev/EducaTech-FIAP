@@ -6,7 +6,7 @@ import EmptyState from '../components/EmptyState';
 import ErrorMessage from '../components/ErrorMessage';
 import Loading from '../components/Loading';
 import { deletePost, listPosts } from '../services/api';
-import { Button, ButtonLink, Card, PageHeader, Subtitle } from '../styles/ui';
+import { ButtonLink, Card, IconButton, IconLink, PageHeader, Subtitle } from '../styles/ui';
 import { formatDate } from '../utils/format';
 
 const TableWrapper = styled(Card)`
@@ -28,8 +28,8 @@ const Table = styled.table`
   }
 
   th {
-    background-color: ${({ theme }) => theme.colors.primaryLight};
-    color: ${({ theme }) => theme.colors.primaryDark};
+    background-color: ${({ theme }) => theme.colors.secondaryLight};
+    color: ${({ theme }) => theme.colors.secondaryDark};
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.03em;
@@ -158,21 +158,23 @@ function AdminPage() {
                   <td>{formatDate(post.createdAt)}</td>
                   <td>
                     <RowActions>
-                      <ButtonLink
+                      <IconLink
                         to={`/admin/posts/${post.id}/editar`}
                         $variant="secondary"
                         aria-label={`Editar a postagem ${post.title}`}
+                        title="Editar"
                       >
-                        Editar
-                      </ButtonLink>
-                      <Button
+                        ✎
+                      </IconLink>
+                      <IconButton
                         type="button"
                         $variant="danger"
                         aria-label={`Excluir a postagem ${post.title}`}
+                        title="Excluir"
                         onClick={() => handleDelete(post)}
                       >
-                        Excluir
-                      </Button>
+                        ✕
+                      </IconButton>
                     </RowActions>
                   </td>
                 </tr>

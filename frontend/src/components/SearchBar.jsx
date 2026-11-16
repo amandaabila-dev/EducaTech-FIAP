@@ -19,7 +19,8 @@ const Field = styled.div`
     margin-bottom: ${({ theme }) => theme.spacing.xs};
   }
 
-  input {
+  input,
+  select {
     width: 100%;
     padding: 0.65rem 0.8rem;
     border: 1px solid ${({ theme }) => theme.colors.border};
@@ -41,23 +42,47 @@ const Clear = styled.button`
   }
 `;
 
-function SearchBar({ value, onChange, onSubmit, onClear }) {
+function SearchBar({
+  value,
+  onChange,
+  subject,
+  subjects = [],
+  onSubjectChange,
+  onSubmit,
+  onClear,
+}) {
   return (
     <Form role="search" onSubmit={onSubmit}>
       <Field>
-        <label htmlFor="busca">Buscar postagens</label>
+        <label htmlFor="busca">Palavra-chave</label>
         <input
           id="busca"
           type="search"
-          placeholder="Digite um título, autor, matéria ou palavra-chave"
+          placeholder="Título, autor ou trecho do conteúdo"
           value={value}
           onChange={(event) => onChange(event.target.value)}
         />
       </Field>
 
+      <Field>
+        <label htmlFor="materia">Matéria</label>
+        <select
+          id="materia"
+          value={subject}
+          onChange={(event) => onSubjectChange(event.target.value)}
+        >
+          <option value="">Todas</option>
+          {subjects.map((materia) => (
+            <option key={materia} value={materia}>
+              {materia}
+            </option>
+          ))}
+        </select>
+      </Field>
+
       <Button type="submit">Buscar</Button>
 
-      {value && (
+      {(value || subject) && (
         <Clear type="button" onClick={onClear}>
           Limpar
         </Clear>

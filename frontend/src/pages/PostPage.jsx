@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 import ErrorMessage from '../components/ErrorMessage';
@@ -73,7 +73,11 @@ function PostPage() {
 
   return (
     <Article>
-      {post.subject && <Tag>{post.subject}</Tag>}
+      {post.subject && (
+        <Tag as={Link} to={`/?subject=${encodeURIComponent(post.subject)}`}>
+          {post.subject}
+        </Tag>
+      )}
 
       <h1>{post.title}</h1>
 

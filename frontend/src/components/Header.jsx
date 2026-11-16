@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../styles/ui';
 
 const Bar = styled.header`
-  background-color: ${({ theme }) => theme.colors.primaryDark};
+  background-color: ${({ theme }) => theme.colors.ink};
   color: ${({ theme }) => theme.colors.textInverse};
   box-shadow: ${({ theme }) => theme.shadows.md};
 `;
@@ -29,16 +29,24 @@ const Inner = styled.div`
 
 const Brand = styled(Link)`
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
   color: ${({ theme }) => theme.colors.textInverse};
 
   &:hover {
     text-decoration: none;
   }
 
+  img {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+  }
+
   strong {
     font-size: 1.25rem;
     letter-spacing: 0.02em;
+    display: block;
   }
 
   span {
@@ -117,8 +125,11 @@ function Header() {
     <Bar>
       <Inner>
         <Brand to="/">
-          <strong>EducaTech FIAP</strong>
-          <span>Blog educacional</span>
+          <img src="/logo.png" alt="Logo EducaTech FIAP" />
+          <span>
+            <strong>EducaTech FIAP</strong>
+            <span>Blog educacional</span>
+          </span>
         </Brand>
 
         <Toggle

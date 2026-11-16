@@ -64,8 +64,16 @@ export function listPosts() {
   return request('/posts');
 }
 
-export function searchPosts(term) {
-  return request(`/posts/search?q=${encodeURIComponent(term)}`);
+export function searchPosts(termOrOptions, subject) {
+  const options =
+    typeof termOrOptions === 'string' || termOrOptions == null
+      ? { q: termOrOptions, subject }
+      : termOrOptions;
+
+  const params = new URLSearchParams();
+  if (options.q) params.set('q', options.q);
+  if (options.subject) params.set('subject', options.subject);
+  return request(`/posts/search?${params.toString()}`);
 }
 
 export function getPost(id) {
