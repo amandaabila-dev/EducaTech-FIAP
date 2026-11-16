@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "EducaTech FIAP",
+    "slug": "educatech-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "icon": "./assets/logo.png",
+    "splash": {
+      "image": "./assets/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ED145B"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "br.fiap.educatech"
+    },
+    "android": {
+      "usesCleartextTraffic": true,
+      "package": "br.fiap.educatech",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo.png",
+        "backgroundColor": "#ED145B"
+      }
+    },
+    "plugins": [
+      "expo-asset",
+      "expo-font"
+    ]
+  }
+}
